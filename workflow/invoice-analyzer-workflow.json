@@ -1,1 +1,512 @@
 
+{
+  "name": "DAY-8",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Invoice__PDF_",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -144,
+        64
+      ],
+      "id": "dc90deb7-f3e2-47db-a706-cae1583e0f2f",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following invoice information and extract all available details.\n\nInvoice data:\n\n{{ $json.text }}\n\nReturn the information according to the required structured output.\n\nRemember:\n- Do not invent missing information.\n- Use null for unavailable fields.\n- Extract all invoice items.\n- Check the mathematical consistency of the invoice.\n- Identify missing information and possible anomalies.\n- Provide an invoice quality score from 0 to 100.\n- Provide a concise professional summary.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an AI Invoice Analysis Assistant.\n\nYour task is to analyze invoice data extracted from a PDF and return accurate, structured information.\n\nIMPORTANT RULES:\n\n1. Extract information only from the provided invoice.\n2. Never invent, assume, or hallucinate missing information.\n3. If a field is not available, return null.\n4. Preserve the original currency.\n5. Extract every visible invoice item.\n6. Calculate item totals only when quantity and unit price are available.\n7. Verify the subtotal against the extracted line items whenever possible.\n8. Identify discrepancies between line-item totals, subtotal, tax, discount, and final total.\n9. Identify missing or suspicious information.\n10. Assign an invoice quality score from 0 to 100.\n11. The quality score should consider:\n   - completeness of invoice information\n   - readability\n   - consistency of calculations\n   - presence of important invoice fields\n   - suspicious or conflicting information\n12. Categorize the expense using one of these categories:\n   - Electronics\n   - Software\n   - Office Supplies\n   - Travel\n   - Marketing\n   - Utilities\n   - Professional Services\n   - Food\n   - Transportation\n   - Other\n13. Keep numerical values as numbers, not text.\n14. Return only the requested structured output.\n15. Do not include explanations outside the structured output.\n\nAnalyze the invoice carefully and produce the most accurate result possible."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        80,
+        64
+      ],
+      "id": "501d784f-6e90-4d09-a416-ad1735e9b926",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"invoice_number\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"invoice_date\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"due_date\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"vendor\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"customer\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"items\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"description\": {\n            \"type\": \"string\"\n          },\n          \"quantity\": {\n            \"type\": [\"number\", \"null\"]\n          },\n          \"unit_price\": {\n            \"type\": [\"number\", \"null\"]\n          },\n          \"total\": {\n            \"type\": [\"number\", \"null\"]\n          }\n        },\n        \"required\": [\n          \"description\",\n          \"quantity\",\n          \"unit_price\",\n          \"total\"\n        ]\n      }\n    },\n    \"subtotal\": {\n      \"type\": [\"number\", \"null\"]\n    },\n    \"tax\": {\n      \"type\": [\"number\", \"null\"]\n    },\n    \"discount\": {\n      \"type\": [\"number\", \"null\"]\n    },\n    \"total_amount\": {\n      \"type\": [\"number\", \"null\"]\n    },\n    \"currency\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"payment_status\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"expense_category\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"missing_information\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"anomalies\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"invoice_quality_score\": {\n      \"type\": [\"number\", \"null\"]\n    },\n    \"summary\": {\n      \"type\": [\"string\", \"null\"]\n    }\n  },\n  \"required\": [\n    \"invoice_number\",\n    \"invoice_date\",\n    \"due_date\",\n    \"vendor\",\n    \"customer\",\n    \"items\",\n    \"subtotal\",\n    \"tax\",\n    \"discount\",\n    \"total_amount\",\n    \"currency\",\n    \"payment_status\",\n    \"expense_category\",\n    \"missing_information\",\n    \"anomalies\",\n    \"invoice_quality_score\",\n    \"summary\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        320
+      ],
+      "id": "43ad8da7-5e53-40fc-bc67-3a87d0293a85",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        304
+      ],
+      "id": "859e86b2-faca-4017-a0ae-90f076b69561",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ph9SGXZi4IPq4AJU",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the AI Agent output\nconst raw = $json.output ?? $json;\n\n// Convert string output to JSON if necessary\nlet invoice;\n\nif (typeof raw === \"string\") {\n  try {\n    invoice = JSON.parse(raw);\n  } catch (error) {\n    throw new Error(\"AI Agent output is not valid JSON.\");\n  }\n} else {\n  invoice = raw;\n}\n\n// Make sure invoice is an object\nif (!invoice || typeof invoice !== \"object\") {\n  throw new Error(\"AI Agent did not return a valid invoice object.\");\n}\n\nconst errors = [];\n\n// Required field checks\nif (!invoice.invoice_number) {\n  errors.push(\"Invoice number is missing\");\n}\n\nif (!invoice.invoice_date) {\n  errors.push(\"Invoice date is missing\");\n}\n\nif (!invoice.vendor) {\n  errors.push(\"Vendor name is missing\");\n}\n\nif (\n  invoice.total_amount === null ||\n  invoice.total_amount === undefined\n) {\n  errors.push(\"Total amount is missing\");\n}\n\n// Calculate subtotal from line items\nconst calculatedSubtotal = (invoice.items || []).reduce(\n  (sum, item) => {\n    const quantity = Number(item.quantity) || 0;\n    const unitPrice = Number(item.unit_price) || 0;\n\n    return sum + (quantity * unitPrice);\n  },\n  0\n);\n\n// Compare extracted subtotal with calculated subtotal\nlet subtotalDifference = null;\n\nif (\n  invoice.subtotal !== null &&\n  invoice.subtotal !== undefined\n) {\n  subtotalDifference =\n    Math.abs(Number(invoice.subtotal) - calculatedSubtotal);\n}\n\n// Determine validation status\nconst calculationValid =\n  subtotalDifference === null ||\n  subtotalDifference < 0.01;\n\nconst validationStatus =\n  errors.length === 0 && calculationValid\n    ? \"Valid\"\n    : \"Needs Review\";\n\n// Return validated invoice data\nreturn {\n  json: {\n    ...invoice,\n\n    calculated_subtotal: Number(\n      calculatedSubtotal.toFixed(2)\n    ),\n\n    subtotal_difference:\n      subtotalDifference !== null\n        ? Number(subtotalDifference.toFixed(2))\n        : null,\n\n    validation_status: validationStatus,\n\n    validation_errors: errors\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        64
+      ],
+      "id": "4012f12b-c821-4dac-8edb-59059d38004e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the AI Agent / previous Code node output\nconst raw = $json.output ?? $json;\n\n// Convert string output to JSON if necessary\nlet invoice;\n\nif (typeof raw === \"string\") {\n  try {\n    invoice = JSON.parse(raw);\n  } catch (error) {\n    throw new Error(\"Previous node output is not valid JSON.\");\n  }\n} else {\n  invoice = raw;\n}\n\n// Make sure invoice is an object\nif (!invoice || typeof invoice !== \"object\") {\n  throw new Error(\"Invoice data is not a valid object.\");\n}\n\n// Build searchable text for expense categorization\nconst text = [\n  invoice.vendor || \"\",\n  invoice.summary || \"\",\n  ...(invoice.items || []).map(\n    item => item.description || \"\"\n  )\n]\n  .join(\" \")\n  .toLowerCase();\n\nlet category = \"Other\";\n\n// Electronics\nif (\n  text.includes(\"laptop\") ||\n  text.includes(\"computer\") ||\n  text.includes(\"desktop\") ||\n  text.includes(\"monitor\") ||\n  text.includes(\"keyboard\") ||\n  text.includes(\"mouse\") ||\n  text.includes(\"printer\") ||\n  text.includes(\"electronics\")\n) {\n  category = \"Electronics\";\n}\n\n// Software\nelse if (\n  text.includes(\"software\") ||\n  text.includes(\"license\") ||\n  text.includes(\"subscription\") ||\n  text.includes(\"saas\")\n) {\n  category = \"Software\";\n}\n\n// Office Supplies\nelse if (\n  text.includes(\"paper\") ||\n  text.includes(\"pen\") ||\n  text.includes(\"stationery\") ||\n  text.includes(\"office supplies\")\n) {\n  category = \"Office Supplies\";\n}\n\n// Travel\nelse if (\n  text.includes(\"flight\") ||\n  text.includes(\"hotel\") ||\n  text.includes(\"travel\") ||\n  text.includes(\"airfare\")\n) {\n  category = \"Travel\";\n}\n\n// Marketing\nelse if (\n  text.includes(\"advertising\") ||\n  text.includes(\"marketing\") ||\n  text.includes(\"promotion\")\n) {\n  category = \"Marketing\";\n}\n\n// Utilities\nelse if (\n  text.includes(\"electricity\") ||\n  text.includes(\"internet\") ||\n  text.includes(\"water\") ||\n  text.includes(\"gas\") ||\n  text.includes(\"utility\")\n) {\n  category = \"Utilities\";\n}\n\n// Professional Services\nelse if (\n  text.includes(\"consulting\") ||\n  text.includes(\"consultancy\") ||\n  text.includes(\"legal\") ||\n  text.includes(\"accounting\")\n) {\n  category = \"Professional Services\";\n}\n\n// Food\nelse if (\n  text.includes(\"food\") ||\n  text.includes(\"restaurant\") ||\n  text.includes(\"catering\") ||\n  text.includes(\"meal\")\n) {\n  category = \"Food\";\n}\n\n// Transportation\nelse if (\n  text.includes(\"taxi\") ||\n  text.includes(\"uber\") ||\n  text.includes(\"transport\") ||\n  text.includes(\"fuel\") ||\n  text.includes(\"petrol\")\n) {\n  category = \"Transportation\";\n}\n\n// Return invoice with expense category\nreturn {\n  json: {\n    ...invoice,\n    expense_category: category\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        64
+      ],
+      "id": "12ee98a5-f469-4961-a3e6-9337e7cd6bbc",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1dEP80M-2uev2k2EjtbNP24a3ahzuTpLX5k3O4gTl2Ko",
+          "mode": "list",
+          "cachedResultName": "DAY-8 INVOICE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dEP80M-2uev2k2EjtbNP24a3ahzuTpLX5k3O4gTl2Ko/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dEP80M-2uev2k2EjtbNP24a3ahzuTpLX5k3O4gTl2Ko/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Invoice Number": "={{ $json.invoice_number }}",
+            "Invoice Date": "={{ $json.invoice_date }}",
+            "Due Date": "={{ $json.due_date }}",
+            "Vendor": "={{ $json.vendor }}",
+            "Customer": "={{ $json.customer }}",
+            "Subtotal": "={{ $json.subtotal }}",
+            "Tax": "={{ $json.tax }}",
+            "Discount": "={{ $json.discount }}",
+            "Total Amount": "={{ $json.total_amount }}",
+            "Currency": "={{ $json.currency }}",
+            "Payment Status": "={{ $json.payment_status }}",
+            "Expense Category": "={{ $json.expense_category }}",
+            "Validation Status": "={{ $json.validation_status }}",
+            "Quality Score": "={{ $json.invoice_quality_score }}",
+            "Missing Information": "={{ $json.missing_information.join(', ') }}",
+            "Anomalies": "={{ $json.anomalies.join(', ') }}",
+            "Summary": "={{ $json.summary }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Invoice Number",
+              "displayName": "Invoice Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Invoice Date",
+              "displayName": "Invoice Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vendor",
+              "displayName": "Vendor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer",
+              "displayName": "Customer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subtotal",
+              "displayName": "Subtotal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tax",
+              "displayName": "Tax",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Discount",
+              "displayName": "Discount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Amount",
+              "displayName": "Total Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Currency",
+              "displayName": "Currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Payment Status",
+              "displayName": "Payment Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Expense Category",
+              "displayName": "Expense Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Validation Status",
+              "displayName": "Validation Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quality Score",
+              "displayName": "Quality Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Missing Information",
+              "displayName": "Missing Information",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Anomalies",
+              "displayName": "Anomalies",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        880,
+        -32
+      ],
+      "id": "14c1a47a-0bf4-410c-83e8-b61f27a9377c",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PJ7xpgsnyi0di1RR",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const invoice = $json;\n\nconst items = (invoice.items || [])\n  .map(item => `\n    <tr>\n      <td>${item.description ?? \"N/A\"}</td>\n      <td>${item.quantity ?? \"N/A\"}</td>\n      <td>${item.unit_price ?? \"N/A\"}</td>\n      <td>${item.total ?? \"N/A\"}</td>\n    </tr>\n  `)\n  .join(\"\");\n\nconst missingInfo =\n  (invoice.missing_information || []).length > 0\n    ? invoice.missing_information.join(\", \")\n    : \"None\";\n\nconst anomalies =\n  (invoice.anomalies || []).length > 0\n    ? invoice.anomalies.join(\", \")\n    : \"None\";\n\nconst html = `\n<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n\n<style>\nbody {\n  font-family: Arial, sans-serif;\n  background: #f4f6f8;\n  margin: 0;\n  padding: 30px;\n}\n\n.container {\n  max-width: 900px;\n  margin: auto;\n  background: white;\n  padding: 35px;\n  border-radius: 10px;\n}\n\nh1 {\n  margin-bottom: 5px;\n}\n\nh2 {\n  margin-top: 30px;\n}\n\n.info {\n  margin: 8px 0;\n}\n\ntable {\n  width: 100%;\n  border-collapse: collapse;\n  margin-top: 15px;\n}\n\nth,\ntd {\n  border: 1px solid #ddd;\n  padding: 10px;\n  text-align: left;\n}\n\nth {\n  background: #f1f1f1;\n}\n\n.summary-box {\n  margin-top: 25px;\n  padding: 20px;\n  border: 1px solid #ddd;\n  border-radius: 8px;\n}\n\n.score {\n  font-size: 24px;\n  font-weight: bold;\n}\n\n.footer {\n  margin-top: 30px;\n  font-size: 12px;\n}\n</style>\n\n</head>\n\n<body>\n\n<div class=\"container\">\n\n<h1>AI Invoice Analysis Report</h1>\n\n<p class=\"info\">\n<strong>Invoice Number:</strong>\n${invoice.invoice_number ?? \"N/A\"}\n</p>\n\n<p class=\"info\">\n<strong>Invoice Date:</strong>\n${invoice.invoice_date ?? \"N/A\"}\n</p>\n\n<p class=\"info\">\n<strong>Due Date:</strong>\n${invoice.due_date ?? \"N/A\"}\n</p>\n\n<p class=\"info\">\n<strong>Vendor:</strong>\n${invoice.vendor ?? \"N/A\"}\n</p>\n\n<p class=\"info\">\n<strong>Customer:</strong>\n${invoice.customer ?? \"N/A\"}\n</p>\n\n<h2>Invoice Items</h2>\n\n<table>\n\n<tr>\n<th>Description</th>\n<th>Quantity</th>\n<th>Unit Price</th>\n<th>Total</th>\n</tr>\n\n${items}\n\n</table>\n\n<h2>Financial Summary</h2>\n\n<p>\n<strong>Subtotal:</strong>\n${invoice.subtotal ?? \"N/A\"} ${invoice.currency ?? \"\"}\n</p>\n\n<p>\n<strong>Tax:</strong>\n${invoice.tax ?? \"N/A\"} ${invoice.currency ?? \"\"}\n</p>\n\n<p>\n<strong>Discount:</strong>\n${invoice.discount ?? \"N/A\"} ${invoice.currency ?? \"\"}\n</p>\n\n<p>\n<strong>Total Amount:</strong>\n${invoice.total_amount ?? \"N/A\"} ${invoice.currency ?? \"\"}\n</p>\n\n<h2>AI Analysis</h2>\n\n<div class=\"summary-box\">\n\n<p>\n<strong>Expense Category:</strong>\n${invoice.expense_category ?? \"Other\"}\n</p>\n\n<p>\n<strong>Payment Status:</strong>\n${invoice.payment_status ?? \"Unknown\"}\n</p>\n\n<p>\n<strong>Validation Status:</strong>\n${invoice.validation_status ?? \"Unknown\"}\n</p>\n\n<p class=\"score\">\nQuality Score:\n${invoice.invoice_quality_score ?? 0}/100\n</p>\n\n<p>\n<strong>Missing Information:</strong>\n${missingInfo}\n</p>\n\n<p>\n<strong>Anomalies:</strong>\n${anomalies}\n</p>\n\n<p>\n<strong>Summary:</strong>\n${invoice.summary ?? \"No summary available.\"}\n</p>\n\n</div>\n\n<div class=\"footer\">\nGenerated automatically by AI Invoice Analyzer\n</div>\n\n</div>\n\n</body>\n</html>\n`;\n\nreturn {\n  json: {\n    ...invoice,\n    html_report: html\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        160
+      ],
+      "id": "1cafb220-e335-4fad-a98b-9a7880b54a04",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "sendTo": "=junaidzulfiqar475@gmail.com",
+        "subject": "=AI Invoice Analysis — {{ $json.invoice_number }} }}",
+        "message": "={{ $json.html_report }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1104,
+        160
+      ],
+      "id": "e85a3eea-0687-4867-99d8-d77e7f6ffe2c",
+      "name": "Send a message",
+      "webhookId": "11db5b42-158a-4f26-9839-8d6847968e37",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "zks4zsngEiR8n9Ci",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "AI INVOICE ANALYZER",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Invoice (PDF)",
+              "fieldType": "file",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -368,
+        64
+      ],
+      "id": "64e0a407-7538-4ebf-8d57-4f2a3ce22877",
+      "name": "On form submission",
+      "webhookId": "3d70fde6-0bfa-493f-8ac7-4c8a48b44641"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a838a52f-2acf-4d05-9f7c-4084be608fbe",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "33d8510a8f6c0705b24da1b4eb98d9cf10d7f638be14770e2af068c96a52da4a"
+  },
+  "nodeGroups": [],
+  "id": "6hWqLkVUV1Znt4qD",
+  "tags": []
+}
