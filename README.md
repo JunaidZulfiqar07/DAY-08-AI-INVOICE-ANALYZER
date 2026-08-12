@@ -575,13 +575,6 @@ DAY-08-AI-INVOICE-ANALYZER/
 
 ---
 
-## 📸 Workflow Preview
-
-Add your n8n workflow screenshot inside the `screenshots` folder.
-
-![DAY 08 Workflow](screenshots/workflow.png)
-
----
 
 ## 🔗 GitHub Repository
 
@@ -596,66 +589,5 @@ https://github.com/JunaidZulfiqar07/DAY-08-AI-INVOICE-ANALYZER
 Computer Engineering Student  
 UET Taxila
 
----
-
-## 🚀 30 Days AI Automation Challenge
-
-This project is **Day 08** of my **30 Days AI Automation Challenge**.
-
-The goal of this challenge is to build one practical AI automation project every day while improving skills in:
-
-- Artificial Intelligence
-- Workflow Automation
-- n8n
-- API Integration
-- AI Agents
-- Prompt Engineering
-- Business Process Automation
-- Real-World AI Solutions
-
----
-
-## 📚 Skills Demonstrated
-
-Through this project, I practiced:
-
-- AI Workflow Automation
-- n8n Workflow Development
-- Prompt Engineering
-- Structured AI Output
-- JSON Data Processing
-- Data Validation
-- Invoice Intelligence
-- Business Process Automation
-- Missing Data Detection
-- AI-Based Classification
-- Workflow Testing
-- Automation Design
-
----
-
-## ⭐ Support
-
-If you find this project useful or interesting, consider giving the repository a ⭐ on GitHub.
-
-Your support helps encourage the development of more practical AI automation projects.
-
----
-
-# 🔥 DAY 08 COMPLETE
-
-## AI Invoice Analyzer
-
-**Built with n8n + AI**
-
-> Automate invoice analysis. Detect missing information. Validate financial data. Categorize expenses. Generate actionable invoice intelligence.
-
----
-
-## 🚀 More Projects Coming
-
-This is only **Day 08** of the challenge.
-
-More AI-powered automation projects will be developed throughout the **30 Days AI Automation Challenge**.
 
 ### Stay tuned for Day 09! 🔥
