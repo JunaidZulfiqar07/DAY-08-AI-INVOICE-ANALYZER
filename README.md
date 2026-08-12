@@ -563,15 +563,15 @@ Generate Final Report
 ## 📁 Project Structure
 
 DAY-08-AI-INVOICE-ANALYZER/
-
-├── README.md  
-├── workflow/  
-│   └── invoice-analyzer-workflow.json  
-├── samples/  
-│   └── sample-invoice.json  
-├── screenshots/  
-│   └── workflow.png  
-└── LICENSE
+│
+├── README.md
+├── LICENSE
+│
+├── screenshots/
+│   └── workflow.png
+│
+└── workflow/
+    └── invoice-analyzer-workflow.json
 
 ---
 
